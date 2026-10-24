@@ -1,0 +1,33 @@
+[Unit]
+Description=isis API (read-only, for a dashboard)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=isis
+Group=isis
+EnvironmentFile=/etc/isis/isis.env
+WorkingDirectory=/opt/isis
+ExecStart=/opt/isis/venv/bin/python -m app.isis.api
+Restart=always
+RestartSec=10
+# reads the DB and the files on the HDD, writes only its search index /var/lib/isis/search.db
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/isis
+ReadOnlyPaths=-/mnt/isis
+MemoryMax=384M
+
+[Install]
+WantedBy=multi-user.target

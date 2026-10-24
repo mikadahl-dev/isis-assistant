@@ -1,0 +1,32 @@
+[Unit]
+Description=jeff decision model (llama.cpp, CPU) for the isis knowledge check
+After=network.target
+
+[Service]
+Type=simple
+User=jeff
+Group=jeff
+# base + ground adapter, loaded but switched per request (lora field); 127.0.0.1 only.
+# --cache-ram 0: the server's RAM prompt cache defaults to 8 GiB and kept every distinct prompt's state
+# (+~42 MB per request, OOM after ~40 requests); jeff never reuses a prompt.
+ExecStart=/opt/jeff/llama.cpp/build/bin/llama-server -m /opt/jeff/models/base-q8_0.gguf -c 8192 -np 1 -t 4 \
+  --lora-init-without-apply --lora /opt/jeff/models/ground.gguf \
+  --no-cache-prompt --cache-ram 0 --ctx-checkpoints 0 --no-webui --no-slots --host 127.0.0.1 --port 8766
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target

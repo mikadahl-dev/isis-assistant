@@ -1,0 +1,28 @@
+[Unit]
+Description=isis sync (ISIS/Moodle -> /var/lib/isis)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=isis
+Group=isis
+EnvironmentFile=/etc/isis/isis.env
+WorkingDirectory=/opt/isis
+ExecStart=/opt/isis/venv/bin/python -m app.isis.sync --quiet
+TimeoutStartSec=30min
+# reads its code, talks HTTPS to ISIS, writes only /var/lib/isis and the HDD folder (- = may be missing)
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/isis -/mnt/isis
+MemoryMax=512M
